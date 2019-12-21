@@ -7,6 +7,9 @@
 # Email spool folder
 /app/spool/*
 
+# IDE projects files
+.idea/
+
 # Cache, session files and logs (Symfony3)
 /var/cache/*
 /var/logs/*
