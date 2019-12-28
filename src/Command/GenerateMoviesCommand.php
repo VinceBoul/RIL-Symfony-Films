@@ -29,7 +29,7 @@ class GenerateMoviesCommand extends Command
 	 */
 	private $container;
 
-    CONST API_URL = "https://api.themoviedb.org/3/trending/all/day?api_key=14110c874d089333cac3f40c97c2427b";
+    CONST API_URL = "https://api.themoviedb.org/3/trending/all/day?language=fr-FR&api_key=14110c874d089333cac3f40c97c2427b";
 
 
 	public function __construct(MovieRepository $movieRepository, ContainerInterface $container)
