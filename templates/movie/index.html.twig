@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Movie index{% endblock %}
+
+{% block body %}
+    <h1>Movie index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Release_date</th>
+                <th>Vote_average</th>
+                <th>TmdbId</th>
+                <th>Overview</th>
+                <th>Poster_path</th>
+                <th>Original_title</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for movie in movies %}
+            <tr>
+                <td>{{ movie.id }}</td>
+                <td>{{ movie.title }}</td>
+                <td>{{ movie.releaseDate ? movie.releaseDate|date('Y-m-d') : '' }}</td>
+                <td>{{ movie.voteAverage }}</td>
+                <td>{{ movie.tmdbId }}</td>
+                <td>{{ movie.overview }}</td>
+                <td>{{ movie.posterPath }}</td>
+                <td>{{ movie.originalTitle }}</td>
+                <td>
+                    <a href="{{ path('movie_show', {'id': movie.id}) }}">show</a>
+                    <a href="{{ path('movie_edit', {'id': movie.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('movie_new') }}">Create new</a>
+{% endblock %}
