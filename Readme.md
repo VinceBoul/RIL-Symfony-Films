@@ -33,6 +33,15 @@ http://files.tmdb.org/p/exports/movie_ids_04_28_2019.json.gzapi_key=14110c874d08
 * Liste des films
 * Liste des séries
 * Liste des genres
+ 
+ 1. Deux entités films et séries
+ 2. Crud film + séries
+ 3. Page des films--entité film
+ 3. Page des séries - entité série
+ 4. Algo d'alimentation des genres, films et séries : proposition de commande basique sica galère- diapo fichier de commande
+ 5. Système de pagination simple
+ 6. Filtrage des films et séries par genre--entité genre + filtrage des films et séries par genre
+ 7. Création compte utilisateur avec page du profil
 
 ## Exercices Niveau Intermédiaire
 
@@ -48,3 +57,16 @@ http://files.tmdb.org/p/exports/movie_ids_04_28_2019.json.gzapi_key=14110c874d08
 * Espace administrateur (sécurisé)
     * Ajout de l'utilisateur Admin
     * Consulter la liste des utilisateurs
+
+
+Niveau intermédiaire
+Récupération code vidéo YouTube
+Liste des épisodes par séries--entité épisode 
+Liste du casting
+Compte utilisateur  : pouvoir sauvegarder les films et séries vus
+Système de pagination ajax.
+Rôle user
+
+Niveau avancé - admin
+Fiche série ou film ne nécessite pas de changer de page.
+Obtenir un site "one page" qui ne nécessite pas de changer de page, sauf pour 
