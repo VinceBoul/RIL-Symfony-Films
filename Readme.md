@@ -43,6 +43,9 @@ http://files.tmdb.org/p/exports/movie_ids_04_28_2019.json.gzapi_key=14110c874d08
  6. Filtrage des films et séries par genre--entité genre + filtrage des films et séries par genre
  7. Création compte utilisateur avec page du profil
 
+* Héritage de template
+* Routes home/ films/ series/ user/
+
 ## Exercices Niveau Intermédiaire
 
 * Le systèle de tâche CRON ne charge pas correctement tous les films.
