@@ -19,6 +19,7 @@ Documentation : https://developers.themoviedb.org/3/movies/get-movie-videos
 
 * Récupérer les films populaires : https://api.themoviedb.org/3/discover/movie?api_key=<api_key>&language=fr-FR&sort_by=popularity.desc&include_adult=false&include_video=false&with_genres=12
 
+* Récupérer l'image d'un film : https://image.tmdb.org/t/p/w500/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg 
 
 http://files.tmdb.org/p/exports/movie_ids_04_28_2019.json.gzapi_key=14110c874d089333cac3f40c97c2427b
 
