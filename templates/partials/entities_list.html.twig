@@ -1,0 +1,34 @@
+
+<div class="row">
+
+    {% set current_path = app.request.get('_route') %}
+
+    {% if current_path is same as('movie_index') %}
+        {% set show_route_name = 'movie_show' %}
+    {% else %}
+        {% set show_route_name = 'serie_show' %}
+    {% endif %}
+    {% for item in itemList %}
+        <div class="card col-md-3 my-3 px-0 mx-auto">
+            <img src="https://image.tmdb.org/t/p/w500{{ item.posterPath }}" class="card-img-top " alt="...">
+            <div class="card-body">
+                <h5 class="card-title">{{ item.title }}</h5>
+                <p class="card-text">{{ item.overview|slice(0, 100) }}</p>
+                <p class="card-text">
+                    <small class="text-muted">
+                        {% if current_path is same as('movie_index') %}
+                            {{ item.releaseDate|date('d-m-Y') }}
+                        {% else %}
+                            {{ item.firstAirDate|date('d-m-Y') }}
+                        {% endif %}
+                    </small>
+                </p>
+                <p class="card-text"><p>Note : {{ item.voteAverage }}</p>
+
+
+                <a class="btn-link" href="{{ path(show_route_name, {'id': item.id}) }}">Détails</a>
+            </div>
+        </div>
+    {% endfor %}
+
+</div>
