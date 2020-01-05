@@ -2,21 +2,21 @@
 
 namespace App\Repository;
 
-use App\Entity\Genre;
+use App\Entity\MovieGenre;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
- * @method Genre|null find($id, $lockMode = null, $lockVersion = null)
- * @method Genre|null findOneBy(array $criteria, array $orderBy = null)
- * @method Genre[]    findAll()
- * @method Genre[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method MovieGenre|null find($id, $lockMode = null, $lockVersion = null)
+ * @method MovieGenre|null findOneBy(array $criteria, array $orderBy = null)
+ * @method MovieGenre[]    findAll()
+ * @method MovieGenre[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class GenreRepository extends ServiceEntityRepository
+class MovieGenreRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Genre::class);
+        parent::__construct($registry, MovieGenre::class);
     }
 
     // /**
