@@ -14,11 +14,13 @@
             <div class="card-body">
                 <h5 class="card-title">{{ item.title }}</h5>
                 <p class="card-text">{{ item.overview|slice(0, 100) }}</p>
-                <p class="card-text">
-                    {% for genre in item.genre %}
-                        <a href="{{ path('movie_index_genre', {'name' : genre.name}) }}">{{ genre.name }}</a>{% if not loop.last %},{% endif %}
-                    {% endfor %}
-                </p>
+                {% if current_path is same as('movie_index') %}
+                    <p class="card-text">
+                            {% for genre in item.genre %}
+                                <a href="{{ path('movie_index_genre', {'name' : genre.name}) }}">{{ genre.name }}</a>{% if not loop.last %},{% endif %}
+                            {% endfor %}
+                    </p>
+                {% endif %}
                 <p class="card-text">
                     <small class="text-muted">
                         {% if current_path is same as('movie_index') or current_path is same as('movie_index_genre') %}
