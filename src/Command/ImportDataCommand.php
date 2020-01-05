@@ -3,7 +3,9 @@
 namespace App\Command;
 
 use App\Entity\Movie;
+use App\Entity\Serie;
 use App\Repository\MovieRepository;
+use App\Repository\SerieRepository;
 use Doctrine\Bundle\DoctrineBundle\Mapping\ContainerEntityListenerResolver;
 use Doctrine\ORM\EntityManager;
 use Psr\Container\ContainerInterface;
@@ -15,14 +17,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpClient\HttpClient;
 
-class GenerateMoviesCommand extends Command
+class ImportDataCommand extends Command
 {
-    protected static $defaultName = 'app:generate-movies';
+    protected static $defaultName = 'app:import-data';
 
 	/**
 	 * @var MovieRepository
 	 */
     private $movieRepo;
+
+	/**
+	 * @var SerieRepository
+	 */
+	private $serieRepo;
 
 	/**
 	 * @var ContainerInterface
@@ -32,9 +39,10 @@ class GenerateMoviesCommand extends Command
     CONST API_URL = "https://api.themoviedb.org/3/trending/all/day?language=fr-FR&api_key=14110c874d089333cac3f40c97c2427b";
 
 
-	public function __construct(MovieRepository $movieRepository, ContainerInterface $container)
+	public function __construct(MovieRepository $movieRepository, SerieRepository $serieRepository, ContainerInterface $container)
 	{
 		$this->movieRepo = $movieRepository;
+		$this->serieRepo = $serieRepository;
 		$this->container = $container;
 
 		parent::__construct();
@@ -42,9 +50,7 @@ class GenerateMoviesCommand extends Command
 
     protected function configure()
     {
-        $this
-            ->setDescription('Commande qui enregistre les films')
-        ;
+        $this->setDescription('Commande qui enregistre les films et les séries');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -60,6 +66,7 @@ class GenerateMoviesCommand extends Command
         $em = $this->container->get('doctrine')->getManager();
 
         $nbMoviesCreated = 0;
+        $nbSeriesCreated = 0;
         foreach ($responseContent->results as $r){
 
         	if ($r->media_type === "movie"){
@@ -81,12 +88,32 @@ class GenerateMoviesCommand extends Command
 					// Incrémentation du compteur
 					$nbMoviesCreated++;
 				}
+			}elseif ($r->media_type === "tv"){
+				// Si on ne trouve pas le film par son identifiant IMDB
+				if (!$this->serieRepo->findOneBy(['tmdbId' => $r->id])){
+
+					// Création d'un film
+					$serie = new Serie();
+					$serie->setTmdbId($r->id);
+					$serie->setTitle($r->name);
+					$serie->setOriginalTitle($r->original_name);
+					$serie->setOverview($r->overview);
+					$serie->setFirstAirDate(new \DateTime($r->first_air_date));
+					$serie->setVoteAverage($r->vote_average);
+					$serie->setPosterPath($r->poster_path);
+					$em->persist($serie);
+
+					// Incrémentation du compteur
+					$nbSeriesCreated++;
+				}
 			}
 		}
         $em->flush();
 
         $io->success($nbMoviesCreated . ' films ont été créés :)');
+        $io->success($nbSeriesCreated . ' séries ont été créés :)');
 
         return 0;
     }
+
 }
