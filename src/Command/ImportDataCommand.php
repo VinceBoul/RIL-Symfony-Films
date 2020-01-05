@@ -106,9 +106,10 @@ class ImportDataCommand extends Command
 	}
 
 	private function importMovies($data, $nbMoviesCreated){
-		// Si on ne trouve pas le film par son identifiant IMDB
-		if (!$this->movieRepo->findOneBy(['tmdbId' => $data->id])){
 
+		$movie = $this->movieRepo->findOneBy(['tmdbId' => $data->id]);
+		// Si on ne trouve pas le film par son identifiant IMDB
+		if (!$movie){
 			// Création d'un film
 			$movie = new Movie();
 			$movie->setTmdbId($data->id);
@@ -118,11 +119,20 @@ class ImportDataCommand extends Command
 			$movie->setReleaseDate(new \DateTime($data->release_date));
 			$movie->setVoteAverage($data->vote_average);
 			$movie->setPosterPath($data->poster_path);
-			$this->em->persist($movie);
 
 			// Incrémentation du compteur
 			$nbMoviesCreated++;
 		}
+
+		if (count($data->genre_ids) > 0 && count($movie->getGenre()) === 0){
+			foreach ($data->genre_ids as $genre_id){
+				$genre = $this->movieGenreRepo->findOneBy(['tmdbID' => $genre_id]);
+				$movie->addGenre($genre);
+			}
+		}
+		$this->em->persist($movie);
+
+
 		return $nbMoviesCreated;
 	}
 

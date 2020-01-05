@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Movie;
+use App\Entity\MovieGenre;
 use App\Form\MovieType;
 use App\Repository\MovieGenreRepository;
 use App\Repository\MovieRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,21 +19,36 @@ use Symfony\Component\Routing\Annotation\Route;
 class MovieController extends AbstractController
 {
 	/**
-	 * @Route("/", name="movie_index", methods={"GET"})
-	 * @Route("/{genre}", name="genre")
+	 * @Route("/{name}", name="movie_index_genre", methods={"GET"})
+	 * @param MovieGenre|null $genre
 	 * @param MovieRepository $movieRepository
 	 * @param MovieGenreRepository $genreRepo
 	 * @return Response
 	 */
-    public function index($genre = null, MovieRepository $movieRepository, MovieGenreRepository $genreRepo): Response
+    public function indexByGenre(MovieRepository $movieRepository, MovieGenreRepository $genreRepo, MovieGenre $genre): Response
     {
         return $this->render('movie/index.html.twig', [
-            'movies' => $movieRepository->findAll(),
+            'movies' => $movieRepository->getMoviesByGenre($genre->getId()),
 			'genres' => $genreRepo->findAll()
         ]);
     }
 
-    /**
+	/**
+ 	 * @Route("/", name="movie_index", methods={"GET"})
+	 * @param MovieRepository $movieRepository
+	 * @param MovieGenreRepository $genreRepo
+	 * @return Response
+	 */
+	public function index(MovieRepository $movieRepository, MovieGenreRepository $genreRepo): Response
+	{
+		return $this->render('movie/index.html.twig', [
+			'movies' => $movieRepository->findAll(),
+			'genres' => $genreRepo->findAll()
+		]);
+	}
+
+
+	/**
      * @Route("/new", name="movie_new", methods={"GET","POST"})
      */
     public function new(Request $request): Response
