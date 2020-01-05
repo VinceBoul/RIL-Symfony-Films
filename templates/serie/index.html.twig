@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Serie index{% endblock %}
+
+{% block body_content %}
+    <h1>Séries</h1>
+
+    {% include 'partials/entities_list.html.twig' with { 'itemList' : series } %}
+
+{% endblock %}
