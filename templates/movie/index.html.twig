@@ -5,6 +5,17 @@
 {% block body_content %}
     <h1>Films</h1>
 
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Genres
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+            {% for genre in genres %}
+                <button class="dropdown-item" type="button">{{ genre.name }}</button>
+            {% endfor %}
+        </div>
+    </div>
+
     {% include 'partials/entities_list.html.twig' with { 'itemList' : movies } %}
 
 {% endblock %}

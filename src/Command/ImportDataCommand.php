@@ -78,7 +78,7 @@ class ImportDataCommand extends Command
 
         $this->importMoviesGenres();
 
-        //$this->importFilmsAndSeries($io);
+        $this->importFilmsAndSeries($io);
 
 		$this->em->flush();
 
@@ -95,47 +95,56 @@ class ImportDataCommand extends Command
 		foreach ($responseContent->results as $r){
 
 			if ($r->media_type === "movie"){
-
-				// Si on ne trouve pas le film par son identifiant IMDB
-				if (!$this->movieRepo->findOneBy(['tmdbId' => $r->id])){
-
-					// Création d'un film
-					$movie = new Movie();
-					$movie->setTmdbId($r->id);
-					$movie->setTitle($r->title);
-					$movie->setOriginalTitle($r->original_title);
-					$movie->setOverview($r->overview);
-					$movie->setReleaseDate(new \DateTime($r->release_date));
-					$movie->setVoteAverage($r->vote_average);
-					$movie->setPosterPath($r->poster_path);
-					$this->em->persist($movie);
-
-					// Incrémentation du compteur
-					$nbMoviesCreated++;
-				}
+				$nbMoviesCreated = $this->importMovies($r, $nbMoviesCreated);
 			}elseif ($r->media_type === "tv"){
-				// Si on ne trouve pas le film par son identifiant IMDB
-				if (!$this->serieRepo->findOneBy(['tmdbId' => $r->id])){
-
-					// Création d'un film
-					$serie = new Serie();
-					$serie->setTmdbId($r->id);
-					$serie->setTitle($r->name);
-					$serie->setOriginalTitle($r->original_name);
-					$serie->setOverview($r->overview);
-					$serie->setFirstAirDate(new \DateTime($r->first_air_date));
-					$serie->setVoteAverage($r->vote_average);
-					$serie->setPosterPath($r->poster_path);
-					$this->em->persist($serie);
-
-					// Incrémentation du compteur
-					$nbSeriesCreated++;
-				}
+				$nbSeriesCreated = $this->importSeries($r, $nbSeriesCreated);
 			}
 		}
 
 		$io->success($nbMoviesCreated . ' films ont été créés :)');
 		$io->success($nbSeriesCreated . ' séries ont été créés :)');
+	}
+
+	private function importMovies($data, $nbMoviesCreated){
+		// Si on ne trouve pas le film par son identifiant IMDB
+		if (!$this->movieRepo->findOneBy(['tmdbId' => $data->id])){
+
+			// Création d'un film
+			$movie = new Movie();
+			$movie->setTmdbId($data->id);
+			$movie->setTitle($data->title);
+			$movie->setOriginalTitle($data->original_title);
+			$movie->setOverview($data->overview);
+			$movie->setReleaseDate(new \DateTime($data->release_date));
+			$movie->setVoteAverage($data->vote_average);
+			$movie->setPosterPath($data->poster_path);
+			$this->em->persist($movie);
+
+			// Incrémentation du compteur
+			$nbMoviesCreated++;
+		}
+		return $nbMoviesCreated;
+	}
+
+	private function importSeries($data, $nbSeriesCreated){
+		// Si on ne trouve pas le film par son identifiant IMDB
+		if (!$this->serieRepo->findOneBy(['tmdbId' => $data->id])){
+
+			// Création d'un film
+			$serie = new Serie();
+			$serie->setTmdbId($data->id);
+			$serie->setTitle($data->name);
+			$serie->setOriginalTitle($data->original_name);
+			$serie->setOverview($data->overview);
+			$serie->setFirstAirDate(new \DateTime($data->first_air_date));
+			$serie->setVoteAverage($data->vote_average);
+			$serie->setPosterPath($data->poster_path);
+			$this->em->persist($serie);
+
+			// Incrémentation du compteur
+			$nbSeriesCreated++;
+		}
+		return $nbSeriesCreated;
 	}
 
 	/**

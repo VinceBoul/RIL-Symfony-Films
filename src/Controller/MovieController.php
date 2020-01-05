@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Movie;
 use App\Form\MovieType;
+use App\Repository\MovieGenreRepository;
 use App\Repository\MovieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,13 +16,18 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class MovieController extends AbstractController
 {
-    /**
-     * @Route("/", name="movie_index", methods={"GET"})
-     */
-    public function index(MovieRepository $movieRepository): Response
+	/**
+	 * @Route("/", name="movie_index", methods={"GET"})
+	 * @Route("/{genre}", name="genre")
+	 * @param MovieRepository $movieRepository
+	 * @param MovieGenreRepository $genreRepo
+	 * @return Response
+	 */
+    public function index($genre = null, MovieRepository $movieRepository, MovieGenreRepository $genreRepo): Response
     {
         return $this->render('movie/index.html.twig', [
             'movies' => $movieRepository->findAll(),
+			'genres' => $genreRepo->findAll()
         ]);
     }
 
