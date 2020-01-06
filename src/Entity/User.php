@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -34,6 +36,16 @@ class User implements UserInterface
      * @ORM\Column(type="string")
      */
     private $password;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Movie", mappedBy="user")
+     */
+    private $seen_movies;
+
+    public function __construct()
+    {
+        $this->seen_movies = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -111,5 +123,36 @@ class User implements UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection|Movie[]
+     */
+    public function getSeenMovies(): Collection
+    {
+        return $this->seen_movies;
+    }
+
+    public function addSeenMovie(Movie $seenMovie): self
+    {
+        if (!$this->seen_movies->contains($seenMovie)) {
+            $this->seen_movies[] = $seenMovie;
+            $seenMovie->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSeenMovie(Movie $seenMovie): self
+    {
+        if ($this->seen_movies->contains($seenMovie)) {
+            $this->seen_movies->removeElement($seenMovie);
+            // set the owning side to null (unless already changed)
+            if ($seenMovie->getUser() === $this) {
+                $seenMovie->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

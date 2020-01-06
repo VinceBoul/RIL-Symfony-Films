@@ -23,4 +23,14 @@ section {
             display: inline-block;
         }
     }
+
+    .seen-movie-check{
+        color: white;
+        font-size: 33px;
+        left: 13px;
+
+        &:hover, &.seen{
+            color: lightgreen;
+        }
+    }
 }

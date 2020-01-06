@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Movie;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class UserController extends AbstractController
@@ -20,4 +23,15 @@ class UserController extends AbstractController
 			return $this->redirectToRoute('site');
 		}
     }
+
+	/**
+	 * @Route("/{id}", name="see_movie", methods={"POST"})
+	 */
+	public function seeMovie(Request $request, Movie $movie): Response
+	{
+
+		dd($movie);
+
+		return $this->render('movie/edit.html.twig');
+	}
 }
