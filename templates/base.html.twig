@@ -32,7 +32,9 @@
                             <a class="nav-link js-scroll-trigger" href="{{ path('serie_index') }}">Séries</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link js-scroll-trigger" href="#contact">Contact</a>
+                            {% if app.user is not null %}
+                                <a href="#" class="nav-link js-scroll-trigger">Connecté en tant que {{ app.user.username }}</a>
+                            {% endif %}
                         </li>
                     </ul>
                 </div>
