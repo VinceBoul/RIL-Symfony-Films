@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class MovieController extends AbstractController
 {
 	/**
-	 * @Route("/{name}", name="movie_index_genre", methods={"GET"})
+	 * @Route("/{name}", options={"expose"=true}, name="movie_index_genre", methods={"GET"})
 	 * @param MovieGenre|null $genre
 	 * @param MovieRepository $movieRepository
 	 * @param MovieGenreRepository $genreRepo
@@ -35,7 +35,7 @@ class MovieController extends AbstractController
     }
 
 	/**
- 	 * @Route("/", name="movie_index", methods={"GET"})
+ 	 * @Route("/", options={"expose"=true}, name="movie_index", methods={"GET"})
 	 * @param MovieRepository $movieRepository
 	 * @param MovieGenreRepository $genreRepo
 	 * @return Response

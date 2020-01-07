@@ -58,6 +58,11 @@ class Movie
      */
     private $genre;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="seen_movies")
+     */
+    private $user;
+
     public function __construct()
     {
         $this->genre = new ArrayCollection();
@@ -174,6 +179,18 @@ class Movie
         if ($this->genre->contains($genre)) {
             $this->genre->removeElement($genre);
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }
