@@ -27,28 +27,3 @@
     {% include 'partials/entities_list.html.twig' with { 'itemList' : movies } %}
 
 {% endblock %}
-
-{% block movie_js %}
-    <script>
-        $(document).on('click', '.seen-movie-check', function(){
-            console.log($(this));
-            $.ajax({
-            {#url:'{{ (path('app_bundle_route')) }}',#}
-                type: "POST",
-                dataType: "json",
-                data: {
-                    "some_var_name": "some_var_value"
-                },
-                async: true,
-                success: function (data)
-                {
-                    console.log(data)
-                    $('div#ajax-results').html(data.output);
-
-                }
-            });
-            return false;
-
-        });
-    </script>
-{% endblock %}

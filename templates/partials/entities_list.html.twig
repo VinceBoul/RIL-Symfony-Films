@@ -9,17 +9,21 @@
         {% set show_route_name = 'serie_show' %}
     {% endif %}
     {% for item in itemList %}
-        <div class="card col-md-3 my-3 px-0 mx-auto">
-            {% if app.user %}
-                <a href="#" class="seen-movie-check position-absolute">
+        <div class="card col-6 col-md-3 my-3 px-0 mx-auto">
+            {% if app.user and current_path is not same as('user') %}
+                {% set seenMovieClass = '' %}
+                {% if item in app.user.seenmovies %}
+                    {% set seenMovieClass = 'seen' %}
+                {% endif %}
+                <span class="seen-movie-check {{ seenMovieClass }} position-absolute" data-entity-id="{{ item.id }}">
                     <i class="far fa-check-circle"></i>
-                </a>
+                </span>
             {% endif %}
             <img src="https://image.tmdb.org/t/p/w500{{ item.posterPath }}" class="card-img-top " alt="...">
             <div class="card-body">
                 <h5 class="card-title">{{ item.title }}</h5>
                 <p class="card-text">{{ item.overview|slice(0, 100) }}</p>
-                {% if current_path is same as('movie_index') or current_path is same as('movie_index_genre') %}
+                {% if item.releaseDate is defined %}
                     <p class="card-text">
                             {% for genre in item.genre %}
                                 <a href="{{ path('movie_index_genre', {'name' : genre.name}) }}">{{ genre.name }}</a>{% if not loop.last %},{% endif %}
@@ -28,11 +32,13 @@
                 {% endif %}
                 <p class="card-text">
                     <small class="text-muted">
-                        {% if current_path is same as('movie_index') or current_path is same as('movie_index_genre') %}
+
+                        {% if item.releaseDate is defined %}
                             {{ item.releaseDate|date('d-m-Y') }}
                         {% else %}
                             {{ item.firstAirDate|date('d-m-Y') }}
                         {% endif %}
+
                     </small>
                 </p>
                 <p class="card-text"><p>Note : {{ item.voteAverage }}</p>

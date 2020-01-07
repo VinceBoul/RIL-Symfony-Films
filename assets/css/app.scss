@@ -26,8 +26,9 @@ section {
 
     .seen-movie-check{
         color: white;
-        font-size: 33px;
+        font-size: 50px;
         left: 13px;
+        cursor: pointer;
 
         &:hover, &.seen{
             color: lightgreen;
