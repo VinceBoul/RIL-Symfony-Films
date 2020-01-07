@@ -47,4 +47,12 @@ class MovieRepository extends ServiceEntityRepository
         ;
     }
     */
+
+	public function getMoviesByGenre($id)
+	{
+		$qb = $this->createQueryBuilder('p');
+		$qb->join('p.genre', 'f')
+			->where($qb->expr()->eq('f.id', $id));
+		return $qb->getQuery()->getResult();
+	}
 }

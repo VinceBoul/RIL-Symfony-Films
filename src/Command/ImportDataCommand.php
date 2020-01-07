@@ -2,8 +2,12 @@
 
 namespace App\Command;
 
+use App\Entity\Genre;
 use App\Entity\Movie;
+use App\Entity\MovieGenre;
 use App\Entity\Serie;
+use App\Repository\GenreRepository;
+use App\Repository\MovieGenreRepository;
 use App\Repository\MovieRepository;
 use App\Repository\SerieRepository;
 use Doctrine\Bundle\DoctrineBundle\Mapping\ContainerEntityListenerResolver;
@@ -32,18 +36,33 @@ class ImportDataCommand extends Command
 	private $serieRepo;
 
 	/**
+	 * @var MovieGenreRepository
+	 */
+	private $movieGenreRepo;
+
+	/**
 	 * @var ContainerInterface
 	 */
 	private $container;
 
-    CONST API_URL = "https://api.themoviedb.org/3/trending/all/day?language=fr-FR&api_key=14110c874d089333cac3f40c97c2427b";
+	/**
+	 * @var EntityManager $em
+	 */
+	private $em;
 
 
-	public function __construct(MovieRepository $movieRepository, SerieRepository $serieRepository, ContainerInterface $container)
+	CONST API_URL = "https://api.themoviedb.org/3/trending/all/day?language=fr-FR&api_key=14110c874d089333cac3f40c97c2427b";
+
+	CONST API_URL_MOVIE_GENRES = "https://api.themoviedb.org/3/genre/movie/list?api_key=14110c874d089333cac3f40c97c2427b&language=fr-FR";
+
+
+	public function __construct(MovieRepository $movieRepository, SerieRepository $serieRepository, MovieGenreRepository $movieGenreRepository, ContainerInterface $container)
 	{
 		$this->movieRepo = $movieRepository;
 		$this->serieRepo = $serieRepository;
+		$this->movieGenreRepo = $movieGenreRepository;
 		$this->container = $container;
+		$this->em = $this->container->get('doctrine')->getManager();
 
 		parent::__construct();
 	}
@@ -57,63 +76,107 @@ class ImportDataCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $httpClient = HttpClient::create();
-        $responseContent = json_decode($httpClient->request('GET', self::API_URL)->getContent());
+        $this->importMoviesGenres();
 
-		/**
-		 * @var EntityManager $em
-		 */
-        $em = $this->container->get('doctrine')->getManager();
+        $this->importFilmsAndSeries($io);
 
-        $nbMoviesCreated = 0;
-        $nbSeriesCreated = 0;
-        foreach ($responseContent->results as $r){
+		$this->em->flush();
 
-        	if ($r->media_type === "movie"){
 
-        		// Si on ne trouve pas le film par son identifiant IMDB
-        		if (!$this->movieRepo->findOneBy(['tmdbId' => $r->id])){
-
-        			// Création d'un film
-					$movie = new Movie();
-					$movie->setTmdbId($r->id);
-					$movie->setTitle($r->title);
-					$movie->setOriginalTitle($r->original_title);
-					$movie->setOverview($r->overview);
-					$movie->setReleaseDate(new \DateTime($r->release_date));
-					$movie->setVoteAverage($r->vote_average);
-					$movie->setPosterPath($r->poster_path);
-					$em->persist($movie);
-
-					// Incrémentation du compteur
-					$nbMoviesCreated++;
-				}
-			}elseif ($r->media_type === "tv"){
-				// Si on ne trouve pas le film par son identifiant IMDB
-				if (!$this->serieRepo->findOneBy(['tmdbId' => $r->id])){
-
-					// Création d'un film
-					$serie = new Serie();
-					$serie->setTmdbId($r->id);
-					$serie->setTitle($r->name);
-					$serie->setOriginalTitle($r->original_name);
-					$serie->setOverview($r->overview);
-					$serie->setFirstAirDate(new \DateTime($r->first_air_date));
-					$serie->setVoteAverage($r->vote_average);
-					$serie->setPosterPath($r->poster_path);
-					$em->persist($serie);
-
-					// Incrémentation du compteur
-					$nbSeriesCreated++;
-				}
-			}
-		}
-        $em->flush();
-
-        $io->success($nbMoviesCreated . ' films ont été créés :)');
-        $io->success($nbSeriesCreated . ' séries ont été créés :)');
-
-        return 0;
+		return 0;
     }
 
+    private function importFilmsAndSeries(SymfonyStyle $io){
+		$httpClient = HttpClient::create();
+		$responseContent = json_decode($httpClient->request('GET', self::API_URL)->getContent());
+
+		$nbMoviesCreated = 0;
+		$nbSeriesCreated = 0;
+		foreach ($responseContent->results as $r){
+
+			if ($r->media_type === "movie"){
+				$nbMoviesCreated = $this->importMovies($r, $nbMoviesCreated);
+			}elseif ($r->media_type === "tv"){
+				$nbSeriesCreated = $this->importSeries($r, $nbSeriesCreated);
+			}
+		}
+
+		$io->success($nbMoviesCreated . ' films ont été créés :)');
+		$io->success($nbSeriesCreated . ' séries ont été créés :)');
+	}
+
+	private function importMovies($data, $nbMoviesCreated){
+
+		$movie = $this->movieRepo->findOneBy(['tmdbId' => $data->id]);
+		// Si on ne trouve pas le film par son identifiant IMDB
+		if (!$movie){
+			// Création d'un film
+			$movie = new Movie();
+			$movie->setTmdbId($data->id);
+			$movie->setTitle($data->title);
+			$movie->setOriginalTitle($data->original_title);
+			$movie->setOverview($data->overview);
+			$movie->setReleaseDate(new \DateTime($data->release_date));
+			$movie->setVoteAverage($data->vote_average);
+			$movie->setPosterPath($data->poster_path);
+
+			// Incrémentation du compteur
+			$nbMoviesCreated++;
+		}
+
+		if (count($data->genre_ids) > 0 && count($movie->getGenre()) === 0){
+			foreach ($data->genre_ids as $genre_id){
+				$genre = $this->movieGenreRepo->findOneBy(['tmdbID' => $genre_id]);
+				$movie->addGenre($genre);
+			}
+		}
+		$this->em->persist($movie);
+
+
+		return $nbMoviesCreated;
+	}
+
+	private function importSeries($data, $nbSeriesCreated){
+		// Si on ne trouve pas le film par son identifiant IMDB
+		if (!$this->serieRepo->findOneBy(['tmdbId' => $data->id])){
+
+			// Création d'un film
+			$serie = new Serie();
+			$serie->setTmdbId($data->id);
+			$serie->setTitle($data->name);
+			$serie->setOriginalTitle($data->original_name);
+			$serie->setOverview($data->overview);
+			$serie->setFirstAirDate(new \DateTime($data->first_air_date));
+			$serie->setVoteAverage($data->vote_average);
+			$serie->setPosterPath($data->poster_path);
+			$this->em->persist($serie);
+
+			// Incrémentation du compteur
+			$nbSeriesCreated++;
+		}
+		return $nbSeriesCreated;
+	}
+
+	/**
+	 * Import les genres de films
+	 * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+	 * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+	 * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+	 * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+	 */
+    private function importMoviesGenres()
+	{
+		if (count($this->movieGenreRepo->findAll()) === 0){
+
+			$httpClient = HttpClient::create();
+			$responseContent = json_decode($httpClient->request('GET', self::API_URL_MOVIE_GENRES)->getContent());
+
+			foreach ($responseContent->genres as $g) {
+				$genre = new MovieGenre();
+				$genre->setName($g->name);
+				$genre->setTmdbID($g->id);
+				$this->em->persist($genre);
+			}
+		}
+	}
 }
