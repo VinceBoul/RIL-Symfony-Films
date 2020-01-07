@@ -14,4 +14,13 @@ header {
 
 section {
     padding: 50px 0;
+
+    .dropdown-menu{
+        //display: inline-block;
+
+        .dropdown-item{
+            width: auto;
+            display: inline-block;
+        }
+    }
 }

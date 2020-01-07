@@ -3,7 +3,26 @@
 {% block title %}Movie index{% endblock %}
 
 {% block body_content %}
-    <h1>Films</h1>
+    <h1>
+        <a href="{{ path('movie_index') }}">Films</a>
+        {% set current_path = app.request.get('_route') %}
+
+        {% if current_path is same as('movie_index_genre') %}
+            > {{ genre.name }}
+        {% endif %}
+    </h1>
+
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Genres
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+            {% for genre in genres %}
+                <a  href="{{ path('movie_index_genre', {'name' : genre.name}) }}"
+                    class="btn dropdown-item" type="button">{{ genre.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
 
     {% include 'partials/entities_list.html.twig' with { 'itemList' : movies } %}
 
