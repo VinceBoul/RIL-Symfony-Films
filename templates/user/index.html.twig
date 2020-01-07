@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello UserController!{% endblock %}
+
+{% block body_content %}
+    <h1>Page utilisateur {{ user.username }}</h1>
+
+    <h2>Films vus</h2>
+
+    {% include 'partials/entities_list.html.twig' with { 'itemList' : user.seenmovies } %}
+
+{% endblock %}
