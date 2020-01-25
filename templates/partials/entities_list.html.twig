@@ -14,8 +14,13 @@
                 {% set seenMovieClass = '' %}
                 {% if item in app.user.seenmovies %}
                     {% set seenMovieClass = 'seen' %}
+                    {% set entityType = 'movie' %}
                 {% endif %}
-                <span class="seen-movie-check {{ seenMovieClass }} position-absolute" data-entity-id="{{ item.id }}">
+                {% if item in app.user.series %}
+                    {% set seenMovieClass = 'seen' %}
+                    {% set entityType = 'serie' %}
+                {% endif %}
+                <span class="seen-movie-check {{ seenMovieClass }} {{ entityType }} position-absolute" data-entity-id="{{ item.tmdbId }}">
                     <i class="far fa-check-circle"></i>
                 </span>
             {% endif %}
