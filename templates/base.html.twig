@@ -35,7 +35,7 @@
                             {% if app.user is not null %}
                                 <a href="{{ path('user') }}" class="nav-link js-scroll-trigger">Connecté en tant que {{ app.user.username }}</a>
                             {% else %}
-                                <a href="{{ path('login') }}" class="nav-link js-scroll-trigger">Se connecter</a>
+                                {#<a href="{{ path('login') }}" class="nav-link js-scroll-trigger">Se connecter</a>#}
                             {% endif %}
                         </li>
                     </ul>
@@ -46,12 +46,11 @@
         <header class="bg-primary text-white">
             <div class="container text-center">
                 <h1>Bienvenue</h1>
-                <p class="lead">Site de test qui présente des séries de films et de séries consommés via une API</p>
             </div>
         </header>
 
         <section id="about">
-            <div class="container">
+            <div class="container py-5">
                 {% block body_content %}{% endblock %}
             </div>
         </section>
