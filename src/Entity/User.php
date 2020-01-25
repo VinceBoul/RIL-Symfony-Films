@@ -42,9 +42,15 @@ class User implements UserInterface
      */
     private $seen_movies;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Serie", inversedBy="users")
+     */
+    private $series;
+
     public function __construct()
     {
         $this->seen_movies = new ArrayCollection();
+        $this->series = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -147,6 +153,32 @@ class User implements UserInterface
     {
         if ($this->seen_movies->contains($seenMovie)) {
             $this->seen_movies->removeElement($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Serie[]
+     */
+    public function getSeries(): Collection
+    {
+        return $this->series;
+    }
+
+    public function addSeries(Serie $series): self
+    {
+        if (!$this->series->contains($series)) {
+            $this->series[] = $series;
+        }
+
+        return $this;
+    }
+
+    public function removeSeries(Serie $series): self
+    {
+        if ($this->series->contains($series)) {
+            $this->series->removeElement($series);
         }
 
         return $this;
