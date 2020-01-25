@@ -38,7 +38,7 @@ class User implements UserInterface
     private $password;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Movie", mappedBy="user")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Movie", mappedBy="users")
      */
     private $seen_movies;
 
@@ -137,7 +137,7 @@ class User implements UserInterface
     {
         if (!$this->seen_movies->contains($seenMovie)) {
             $this->seen_movies[] = $seenMovie;
-            $seenMovie->setUser($this);
+            $seenMovie->addUser($this);
         }
 
         return $this;
@@ -146,11 +146,7 @@ class User implements UserInterface
     public function removeSeenMovie(Movie $seenMovie): self
     {
         if ($this->seen_movies->contains($seenMovie)) {
-            $this->seen_movies->removeElement($seenMovie);
-            // set the owning side to null (unless already changed)
-            if ($seenMovie->getUser() === $this) {
-                $seenMovie->setUser(null);
-            }
+            $this->seen_movies->removeElement($this);
         }
 
         return $this;
