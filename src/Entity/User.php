@@ -149,10 +149,6 @@ class User implements UserInterface
             $this->seen_movies->removeElement($this);
         }
 
-        if ($this->seen_movies->contains($seenMovie)) {
-            $this->seen_movies->removeElement($seenMovie);
-        }
-
         return $this;
     }
 }
