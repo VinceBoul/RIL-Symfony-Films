@@ -1,17 +1,32 @@
-# Symfony Films API
+### Symfony Films API
 
-## Installation
-
-* Cloner le projet
+### Installation
 
 * Installer la commande Symfony : https://symfony.com/download
 
-* Lancer la commande composer install
+* Lancer la commande 
+### composer create-project symfony/website-skeleton my_project_name
 
-* Lancer l'application avec la commande 'symfony server:start'
+### Commande "cd my_project_name"
+### Lancer l'application avec la commande 'symfony server:start'
 
 
-# Utilisation API IMDB Movies
+## Champs à créer 
+### title (string)
+### image (string)
+### releaseDate (datetime)
+### note (integer)
+### imdbID (integer)
+### overview (text)
+
+### Création Controller / Formulaire / vues TWIG :  
+###  php bin/console make:crud
+## DATABASE_URL=mysql://root:root@127.0.0.1:8889/symfony_ril_nexflix
+## Créer la BDD :  php bin/console doctrine:database:create
+## Création des fichiers de migration : php bin/console make:migration
+## Création des tables : php bin/console doctrine:migrations:migrate
+
+### Utilisation API IMDB Movies
 
 Documentation : https://developers.themoviedb.org/3/movies/get-movie-videos
 
