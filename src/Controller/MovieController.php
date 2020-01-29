@@ -7,6 +7,8 @@ use App\Entity\MovieGenre;
 use App\Form\MovieType;
 use App\Repository\MovieGenreRepository;
 use App\Repository\MovieRepository;
+use Knp\Component\Pager\PaginatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,11 +17,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/movie")
+ * @IsGranted("ROLE_USER")
  */
 class MovieController extends AbstractController
 {
 	/**
-	 * @Route("/{name}", options={"expose"=true}, name="movie_index_genre", methods={"GET"})
+	 * @Route("/sorted/{name}", options={"expose"=true}, name="movie_index_genre", methods={"GET"})
 	 * @param MovieGenre|null $genre
 	 * @param MovieRepository $movieRepository
 	 * @param MovieGenreRepository $genreRepo
@@ -34,18 +37,27 @@ class MovieController extends AbstractController
         ]);
     }
 
-	/**
- 	 * @Route("/", options={"expose"=true}, name="movie_index", methods={"GET"})
-	 * @param MovieRepository $movieRepository
-	 * @param MovieGenreRepository $genreRepo
-	 * @return Response
-	 */
-	public function index(MovieRepository $movieRepository, MovieGenreRepository $genreRepo): Response
+    /**
+     * @Route("/{page}", requirements={"page" = "\d+"}, defaults={"page": 1}, options={"expose"=true}, name="movie_index", methods={"GET"})
+     * @param MovieRepository $movieRepository
+     * @param PaginatorInterface $paginator
+     * @param MovieGenreRepository $genreRepo
+     * @param $page
+     * @return Response
+     */
+	public function index(MovieRepository $movieRepository,
+                          PaginatorInterface $paginator,
+                          MovieGenreRepository $genreRepo,
+                            $page): Response
 	{
+	    $query = $movieRepository->createQueryBuilder('m')->getQuery();
+	    $pagination = $paginator->paginate($query, $page, 5);
+
 		return $this->render('movie/index.html.twig', [
-			'movies' => $movieRepository->findAll(),
-			'genres' => $genreRepo->findAll()
+            'pagination' => $pagination,
+            'genres' => $genreRepo->findAll()
 		]);
+
 	}
 
 
@@ -73,7 +85,7 @@ class MovieController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="movie_show", methods={"GET"})
+     * @Route("/show/{id}", name="movie_show", methods={"GET"})
      */
     public function show(Movie $movie): Response
     {
